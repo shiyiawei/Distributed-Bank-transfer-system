@@ -1,0 +1,59 @@
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -pthread -O2
+INCLUDES = -Iinclude -Iexternal/labs_headers
+
+# 目录
+SRC_DIR = src
+OBJ_DIR = build/obj
+BIN_DIR = build/bin
+
+# 源文件
+COMMON_SRCS = $(SRC_DIR)/common/clock.cpp $(SRC_DIR)/common/utils.cpp
+SHARD_SRCS = $(SRC_DIR)/shard/account_shard.cpp $(SRC_DIR)/shard/shard_manager.cpp
+PROCESS_SRCS = $(SRC_DIR)/process/parent_controller.cpp $(SRC_DIR)/process/child_worker.cpp
+MAIN_SRC = $(SRC_DIR)/main.cpp
+
+# 目标文件
+COMMON_OBJS = $(COMMON_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+SHARD_OBJS = $(SHARD_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+PROCESS_OBJS = $(PROCESS_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+MAIN_OBJ = $(MAIN_SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+
+ALL_OBJS = $(COMMON_OBJS) $(SHARD_OBJS) $(PROCESS_OBJS) $(MAIN_OBJ)
+
+# 可执行文件
+TARGET = $(BIN_DIR)/banking_system
+
+# 默认目标
+all: $(TARGET)
+
+# 链接
+$(TARGET): $(ALL_OBJS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+# 编译规则
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+# 创建目录
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)/common $(OBJ_DIR)/shard $(OBJ_DIR)/process
+
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
+
+# 清理
+clean:
+	rm -rf build
+
+# 重新编译
+rebuild: clean all
+
+# 依赖关系
+$(COMMON_OBJS): | $(OBJ_DIR)
+$(SHARD_OBJS): $(COMMON_OBJS) | $(OBJ_DIR)
+$(PROCESS_OBJS): $(COMMON_OBJS) $(SHARD_OBJS) | $(OBJ_DIR)
+$(MAIN_OBJ): $(COMMON_OBJS) $(SHARD_OBJS) $(PROCESS_OBJS) | $(OBJ_DIR)
+
+.PHONY: all clean rebuild
