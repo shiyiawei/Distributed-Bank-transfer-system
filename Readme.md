@@ -172,10 +172,7 @@ make
 
 ## 📖 文档
 
-- [BUILD.md](BUILD.md) - 构建指南
 - [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) - 项目结构详解
-- [HEADERS_README.md](HEADERS_README.md) - 头文件说明
-- [DEPENDENCY_GRAPH.md](DEPENDENCY_GRAPH.md) - 依赖关系图
 
 ## 🔍 使用示例
 
